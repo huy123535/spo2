@@ -55,10 +55,10 @@ long crossed_time = 0;
 
 void loop() {
   auto sample = sensor.readSample(1000);
-  float current_value = sample.ir; // Sử dụng IR thay cho Red
+  float current_value = sample.red;
 
   // Detect Finger using raw sensor value
-  if(sample.ir > kFingerThreshold) { // Đổi sang IR
+  if(sample.red > kFingerThreshold) {
     if(millis() - finger_timestamp > kFingerCooldownMs) {
       finger_detected = true;
     }
@@ -127,23 +127,5 @@ void loop() {
     }
     last_diff = current_diff;
   }
-
-  // --- Xuất tín hiệu raw, tín hiệu đã lọc và BPM cho Serial Plotter ---
-  //Serial.println(sample.red);      // Tín hiệu raw
-  //Serial.print(",");
-  Serial.println(current_value);   // Tín hiệu đã lọc
-  //Serial.print(",");
-  //Serial.println(last_diff);
-
-  // if (finger_detected && !isnan(last_diff)) {
-  //   int bpm = 0;
-  //   if (last_heartbeat != 0 && crossed_time - last_heartbeat > 300) {
-  //     bpm = 60000 / (crossed_time - last_heartbeat);
-  //   }
-  //   Serial.println(bpm); // BPM (nếu có, không thì là 0)
-  // } else {
-  //   Serial.println(0);   // Nếu chưa phát hiện nhịp, xuất 0
-  // }
-
   delay(20); // Thêm dòng này để giảm tốc độ vẽ đồ thị (~50Hz)
 }

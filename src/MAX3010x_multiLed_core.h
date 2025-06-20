@@ -150,7 +150,7 @@ public:
   }
   
   /**
-   * ADC Range
+   * Sampling Rate
    */
   enum ADCRange {
     ADC_RANGE_2048NA,   //!< 2048nA Range
@@ -233,16 +233,9 @@ public:
   };
   
   /**
-   * Set Sample Averaging - Thiết lập số mẫu trung bình
-   * @param averaging Tham số chọn số mẫu để lấy trung bình (1-32 mẫu)
-   * @returns true nếu thành công, false nếu thất bại
-   * 
-   * Hàm này thực hiện các bước:
-   * 1. Kiểm tra tham số averaging có hợp lệ không bằng phép AND với mask
-   * 2. Đọc giá trị thanh ghi cấu hình FIFO hiện tại
-   * 3. Xóa các bit cấu hình sample averaging cũ bằng phép AND NOT
-   * 4. Thiết lập các bit mới theo giá trị averaging bằng phép OR
-   * 5. Ghi lại giá trị cấu hình mới vào thanh ghi
+   * Set Sample Averaging
+   * @param averaging Sample averaging
+   * @returns true if successful, otherwise false
    */
   bool setSampleAveraging(SampleAveraging averaging) {
     uint8_t cfg;
@@ -251,7 +244,6 @@ public:
     if(!MAX3010x<MAX3010xImpl, MAX3010xSample>::readByte(FIFO_CFG_REG, cfg)) return false;
     
     cfg &= ~(FIFO_SMP_AVE_MASK << FIFO_SMP_AVE_BIT);
-    // Bits 5,6,7 are used for sample averaging configuration
     cfg |= (static_cast<uint8_t>(averaging) & FIFO_SMP_AVE_MASK) << FIFO_SMP_AVE_BIT;
     
     return MAX3010x<MAX3010xImpl, MAX3010xSample>::writeByte(FIFO_CFG_REG, cfg);

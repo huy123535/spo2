@@ -2,7 +2,7 @@
 #include "filters.h"
 
 // Sensor (adjust to your sensor type)
-MAX30105 sensor;
+MAX30101 sensor;
 const auto kSamplingRate = sensor.SAMPLING_RATE_400SPS;
 const float kSamplingFrequency = 400.0;
 
@@ -23,8 +23,8 @@ const int kAveragingSamples = 50;
 const int kSampleThreshold = 5;
 
 void setup() {
-  Serial.begin(9600);
-
+  Serial.begin(115200);
+  Wire.begin(1,0);
   if(sensor.begin() && sensor.setSamplingRate(kSamplingRate)) { 
     Serial.println("Sensor initialized");
   }

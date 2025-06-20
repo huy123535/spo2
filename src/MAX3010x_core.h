@@ -34,18 +34,11 @@ protected:
   TwoWire& _wire;      //!< I2C Bus Implementation
   
   /**
-   * Read Block - Đọc một khối dữ liệu từ cảm biến MAX3010x qua giao tiếp I2C
-   * @param reg Địa chỉ thanh ghi cần đọc
-   * @param count Số byte cần đọc
-   * @param buffer Bộ đệm để lưu dữ liệu đọc được
-   * @return true nếu đọc thành công, false nếu có lỗi
-   * 
-   * Hàm này thực hiện các bước:
-   * 1. Bắt đầu truyền I2C tới địa chỉ cảm biến
-   * 2. Ghi địa chỉ thanh ghi cần đọc
-   * 3. Yêu cầu đọc số byte mong muốn
-   * 4. Kiểm tra số byte có sẵn
-   * 5. Đọc từng byte vào buffer
+   * Read Block
+   * @param reg Register
+   * @param count Number of bytes to read
+   * @param buffer Buffer for values
+   * @return true if successful, otherwise false
    */
   bool readBlock(uint8_t reg, uint8_t count, uint8_t* buffer) {
     _wire.beginTransmission(_addr);
@@ -73,17 +66,11 @@ protected:
   }
   
   /**
-   * Write Block - Ghi một khối dữ liệu tới cảm biến MAX3010x qua giao tiếp I2C
-   * @param reg Địa chỉ thanh ghi cần ghi dữ liệu
-   * @param count Số byte cần ghi
-   * @param buffer Bộ đệm chứa dữ liệu cần ghi
-   * @return true nếu ghi thành công, false nếu có lỗi
-   * 
-   * Hàm này thực hiện các bước:
-   * 1. Bắt đầu truyền I2C tới địa chỉ cảm biến
-   * 2. Ghi địa chỉ thanh ghi đích
-   * 3. Ghi lần lượt từng byte từ buffer
-   * 4. Kết thúc truyền và kiểm tra kết quả
+   * Write Block
+   * @param reg Register
+   * @param count Number of bytes to write
+   * @param buffer Buffer with values
+   * @return true if successful, otherwise false
    */
   bool writeBlock(uint8_t reg, uint8_t count, uint8_t* buffer) {
     _wire.beginTransmission(_addr);
@@ -107,17 +94,11 @@ protected:
   
   
   /**
-   * Read Bit - Đọc một bit từ thanh ghi của cảm biến MAX3010x
-   * @param reg Địa chỉ thanh ghi cần đọc
-   * @param bit Vị trí bit cần đọc (0-7)
-   * @param value Tham chiếu đến biến bool để lưu kết quả đọc được
-   * @return true nếu đọc thành công, false nếu có lỗi
-   * 
-   * Hàm này thực hiện các bước:
-   * 1. Đọc toàn bộ byte từ thanh ghi qua hàm readByte()
-   * 2. Dịch phải byte để lấy bit cần đọc về vị trí LSB
-   * 3. Dùng phép AND với 0x1 để chỉ lấy giá trị của bit LSB
-   * 4. Lưu kết quả vào biến value
+   * Read Bit
+   * @param reg Register
+   * @param bit Bit Index
+   * @param value Reference to bool variable to store the result in
+   * @return true if successful, otherwise false
    */
   bool readBit(uint8_t reg, uint8_t bit, bool& value) {
     uint8_t byte;
@@ -129,20 +110,12 @@ protected:
   }
   
   /**
-   * Wait for Bit - Chờ đợi cho đến khi một bit trong thanh ghi đạt trạng thái mong muốn
-   * @param reg Địa chỉ thanh ghi cần đọc
-   * @param bit Vị trí bit cần kiểm tra (0-7)
-   * @param expectedState Trạng thái mong muốn của bit (true/false)
-   * @param timeout Thời gian timeout tính bằng ms
-   * @return true nếu bit đạt trạng thái mong muốn, false nếu timeout hoặc có lỗi
-   * 
-   * Hàm này thực hiện các bước:
-   * 1. Khởi tạo biến lưu giá trị bit và thời gian bắt đầu
-   * 2. Lặp kiểm tra giá trị bit cho đến khi:
-   *    - Bit đạt trạng thái mong muốn -> return true
-   *    - Xảy ra lỗi khi đọc bit -> return false  
-   *    - Hết thời gian timeout -> return false
-   * 3. Delay 1ms giữa các lần đọc để tránh quá tải bus I2C
+   * Wait for Bit
+   * @param reg Register
+   * @param bit Bit Index
+   * @param expectedState Expected State
+   * @param timeout Timeout in ms
+   * @return true if successful, otherwise false
    */
   bool waitBit(uint8_t reg, uint8_t bit, bool expectedState = true, int timeout = 100) {
     bool bitValue = !expectedState;
@@ -171,19 +144,6 @@ protected:
    * @param bit Bit Index
    * @param value Value
    * @return true if successful, otherwise false
-   */
-  /**
-   * Set Bit - Thiết lập giá trị cho một bit trong thanh ghi
-   * @param reg Địa chỉ thanh ghi cần ghi
-   * @param bit Vị trí bit cần thiết lập (0-7)
-   * @param value Giá trị cần thiết lập cho bit (true/false)
-   * @return true nếu ghi thành công, false nếu có lỗi
-   * 
-   * Hàm này thực hiện các bước:
-   * 1. Đọc giá trị hiện tại của thanh ghi
-   * 2. Xóa bit cần thiết lập về 0 bằng phép AND với mask
-   * 3. Nếu value=true thì thiết lập bit lên 1 bằng phép OR
-   * 4. Ghi giá trị mới vào thanh ghi
    */
   bool setBit(uint8_t reg, uint8_t bit, bool value) {
     uint8_t byte;

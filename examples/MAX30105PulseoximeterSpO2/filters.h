@@ -1,6 +1,9 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
+#include <Arduino.h>
+#include <math.h>
+
 /**
  * @brief Statistic block for min/nax/avg
  */

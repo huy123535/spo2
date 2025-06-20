@@ -2,16 +2,16 @@
 #include "filters.h"
 
 // Sensor (adjust to your sensor type)
-MAX30105 sensor;
-const auto kSamplingRate = sensor.SAMPLING_RATE_400SPS;
-const float kSamplingFrequency = 400.0;
+MAX30102 sensor;
+const auto kSamplingRate = sensor.SAMPLING_RATE_100SPS;
+const float kSamplingFrequency = 100.0;
 
 // Finger Detection Threshold and Cooldown
 const unsigned long kFingerThreshold = 10000;
 const unsigned int kFingerCooldownMs = 500;
 
 // Edge Detection Threshold (decrease for MAX30100)
-const float kEdgeThreshold = -2000.0;
+const float kEdgeThreshold = -1500.0;
 
 // Filters
 const float kLowPassCutoff = 5.0;
@@ -19,13 +19,16 @@ const float kHighPassCutoff = 0.5;
 
 // Averaging
 const bool kEnableAveraging = false;
-const int kAveragingSamples = 5;
+const int kAveragingSamples = 50;
 const int kSampleThreshold = 5;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Wire.begin(1,0);  
 
-  if(sensor.begin() && sensor.setSamplingRate(kSamplingRate)) { 
+  if(sensor.begin() && sensor.setSamplingRate(kSamplingRate)) {
+    sensor.setLedCurrent(MAX30102::LED_RED, 200);
+    sensor.setLedCurrent(MAX30102::LED_IR, 180);
     Serial.println("Sensor initialized");
   }
   else {
@@ -49,9 +52,12 @@ MinMaxAvgStatistic stat_ir;
 
 // R value to SpO2 calibration factors
 // See https://www.maximintegrated.com/en/design/technical-documents/app-notes/6/6845.html
-float kSpO2_A = 1.5958422;
-float kSpO2_B = -34.6596622;
-float kSpO2_C = 112.6898759;
+float kSpO2_A = -17;
+float kSpO2_B = 104;
+
+// float kSpO2_A = 1.5958422;
+// float kSpO2_B = -34.6596622;
+// float kSpO2_C = 112.6898759;
 
 // Timestamp of the last heartbeat
 long last_heartbeat = 0;
@@ -70,6 +76,10 @@ void loop() {
   float current_value_red = sample.red;
   float current_value_ir = sample.ir;
   
+  // Print raw red LED value for Serial Plotter
+  Serial.println(current_value_red);
+  //delay(50);
+
   // Detect Finger using raw sensor value
   if(sample.red > kFingerThreshold) {
     if(millis() - finger_timestamp > kFingerCooldownMs) {
@@ -125,7 +135,7 @@ void loop() {
           float rred = (stat_red.maximum()-stat_red.minimum())/stat_red.average();
           float rir = (stat_ir.maximum()-stat_ir.minimum())/stat_ir.average();
           float r = rred/rir;
-          float spo2 = kSpO2_A * r * r + kSpO2_B * r + kSpO2_C;
+          float spo2 = kSpO2_A * r + kSpO2_B;
           
           if(bpm > 50 && bpm < 250) {
             // Average?

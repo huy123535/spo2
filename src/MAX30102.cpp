@@ -56,8 +56,8 @@ bool MAX30102::setDefaultConfiguration() {
   MultiLedConfiguration cfg {};
   
   if(!setMultiLedConfiguration(cfg)) return false;
-  if(!setLedCurrent(LED_RED, 90)) return false;
-  if(!setLedCurrent(LED_IR, 80)) return false;
+  if(!setLedCurrent(LED_RED, 35)) return false;
+  if(!setLedCurrent(LED_IR, 35)) return false;
   if(!setResolution(RESOLUTION_18BIT_4110US)) return false;
   if(!setSamplingRate(SAMPLING_RATE_50SPS)) return false;
   if(!setSampleAveraging(SMP_AVE_NONE)) return false;
